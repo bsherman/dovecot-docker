@@ -1,0 +1,46 @@
+
+name: Build Dovecot Docker
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+env:
+  DOVECOT_IMAGE: ghcr.io/bsherman/dovecot
+jobs:
+  build-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout Push to Registry action
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: |
+            default-load=true
+
+      - name: Build Image
+        run: |
+          bash -x build.sh
+          docker images
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Image
+        run: |
+          bash -x publish.sh
+
+      - name: Publish Latest Image
+        run: |
+          bash -x publish-latest.sh

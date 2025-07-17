@@ -2,6 +2,7 @@
 
 set -eux
 
+DOVECOT_IMAGE=${DOVECOT_IMAGE-dovecot/dovecot}
 VERSION=${VERSION-2.4.1}
 DOVECOT_REPO_URL=${DOVECOT_REPO_URL-https://github.com/dovecot/core}
 PIGEONHOLE_REPO_URL=${PIGEONHOLE_REPO_URL-https://github.com/dovecot/pigeonhole}
@@ -22,6 +23,6 @@ for PLATFORM in amd64 arm64; do
 			--build-arg CFLAGS="${!PLATFORM_CFLAGS}" --build-arg LDFLAGS="${!PLATFORM_LDFLAGS}" \
 			--build-arg DOVECOT_REPO_URL=$DOVECOT_REPO_URL --build-arg DOVECOT_BRANCH=$DOVECOT_BRANCH \
 			--build-arg PIGEONHOLE_REPO_URL=$PIGEONHOLE_REPO_URL --build-arg PIGEONHOLE_BRANCH=$DOVECOT_BRANCH \
-			--target production$stage --tag dovecot/dovecot:$VERSION${stage}-$PLATFORM $VERSION
+			--target production$stage --tag $DOVECOT_IMAGE:$VERSION${stage}-$PLATFORM $VERSION
 	done
 done
